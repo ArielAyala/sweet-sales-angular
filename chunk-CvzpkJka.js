@@ -1,0 +1,1 @@
+var e=[`cakes`,`cupcakes`,`cookies`,`other`];export{e as t};
