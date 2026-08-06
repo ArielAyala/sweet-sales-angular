@@ -13,6 +13,21 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Sweet Sales">
+  <script>
+    // Apply the persisted theme before Angular boots to avoid a light-mode flash.
+    (function () {
+      try {
+        var settings = JSON.parse(localStorage.getItem('sweet-sales-settings') || '{}');
+        if (settings.theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (e) {
+        // Ignore malformed storage data.
+      }
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>

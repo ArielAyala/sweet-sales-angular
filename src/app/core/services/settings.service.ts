@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, effect, signal } from '@angular/core';
 import { Language, ThemeMode } from '../../models/enums';
 import { AppSettings } from '../../models/settings.model';
 import { DEFAULT_CURRENCY_CODE } from '../constants/currencies.const';
@@ -27,6 +27,11 @@ export class SettingsService {
     this.settings.set(this.loadSettings());
     this.applyLanguage(this.settings().language);
     this.i18n.setLanguage(this.settings().language);
+
+    // Keep the DOM class in sync with the theme signal for the whole session.
+    effect(() => {
+      this.applyTheme(this.theme());
+    });
   }
 
   readonly language = computed(() => this.settings().language);
@@ -45,7 +50,6 @@ export class SettingsService {
 
   setTheme(theme: ThemeMode): void {
     this.updateSettings({ theme });
-    this.applyTheme(theme);
   }
 
   toggleTheme(): void {
