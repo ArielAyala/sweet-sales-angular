@@ -19,17 +19,17 @@ export class ReportsService {
 
   /**
    * Returns completed orders within the inclusive date range.
+   * Filter is based on the completion date (completedAt), not the delivery date.
    */
   getCompletedInRange(start: Date, end: Date) {
     const startTime = start.getTime();
     const endTime = end.getTime();
     return this.ordersService.orders().filter((o) => {
-      const deliveredAt = new Date(o.deliveryDate).getTime();
-      return (
-        o.status === 'completed' &&
-        deliveredAt >= startTime &&
-        deliveredAt <= endTime
-      );
+      if (o.status !== 'completed' || !o.completedAt) {
+        return false;
+      }
+      const completedAt = new Date(o.completedAt).getTime();
+      return completedAt >= startTime && completedAt <= endTime;
     });
   }
 

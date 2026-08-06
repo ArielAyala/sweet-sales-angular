@@ -14,6 +14,12 @@ function makeOrder(day: number, price: number, productId = 'p1'): OrderInput {
   };
 }
 
+function setCompletedAt(orders: OrdersService, id: string, date: Date) {
+  orders.orders.update((list) =>
+    list.map((o) => (o.id === id ? { ...o, completedAt: date } : o)),
+  );
+}
+
 describe('ReportsService', () => {
   let reports: ReportsService;
   let orders: OrdersService;
@@ -38,6 +44,8 @@ describe('ReportsService', () => {
     const second = orders.createOrder(makeOrder(20, 50000));
     orders.completeOrder(first.id, { adjustedAmount: 90000 });
     orders.completeOrder(second.id);
+    setCompletedAt(orders, first.id, new Date(2026, 7, 5, 12, 0));
+    setCompletedAt(orders, second.id, new Date(2026, 7, 20, 12, 0));
 
     const report = reports.buildReport(new Date(2026, 7, 1), new Date(2026, 7, 31));
     expect(report.totalOrders).toBe(2);
@@ -51,6 +59,7 @@ describe('ReportsService', () => {
     const first = orders.createOrder(makeOrder(5, 100000));
     const pending = orders.createOrder(makeOrder(10, 999999));
     orders.completeOrder(first.id);
+    setCompletedAt(orders, first.id, new Date(2026, 7, 5, 12, 0));
 
     const report = reports.buildReport(new Date(2026, 7, 1), new Date(2026, 7, 31));
     expect(report.totalOrders).toBe(1);
@@ -61,6 +70,7 @@ describe('ReportsService', () => {
   it('excludes orders outside the range', () => {
     const outside = orders.createOrder(makeOrder(1, 100000));
     orders.completeOrder(outside.id);
+    setCompletedAt(orders, outside.id, new Date(2026, 7, 1, 12, 0));
     const report = reports.buildReport(new Date(2026, 7, 5), new Date(2026, 7, 15));
     expect(report.totalOrders).toBe(0);
   });
@@ -75,6 +85,7 @@ describe('ReportsService', () => {
     const input = makeOrder(5, 100000, product.id);
     const order = orders.createOrder(input);
     orders.completeOrder(order.id);
+    setCompletedAt(orders, order.id, new Date(2026, 7, 5, 12, 0));
 
     const report = reports.buildReport(new Date(2026, 7, 1), new Date(2026, 7, 31));
     expect(report.byCategory.find((c) => c.category === 'cakes')?.revenue).toBe(100000);
