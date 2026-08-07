@@ -4,13 +4,17 @@ A **mobile-first Progressive Web App** for managing sweet shop orders — cakes,
 
 **Sweet Sales** (formerly *SweetSalesAngular*) is built with Angular 22 and Tailwind CSS v4.
 
+## Demo
+
+Try the live app: **[https://sweet-sales.arielayala.me/](https://sweet-sales.arielayala.me/)**
+
 ## Features
 
-- **Orders**: create, edit, view and delete orders; mark orders as **pending** or **completed**; adjust the final price (discounts / cost changes) at delivery time; share a formatted order summary.
+- **Orders**: create, edit, view and delete orders; mark as **pending** or **completed**; optional delivery date/time; pickup or delivery; **payment method** (cash / transfer); optional **deposit (seña)** with remaining balance; adjust final price at delivery; share a formatted order summary.
 - **Order history**: browse past orders grouped by status, with search by customer or order number.
 - **Products**: manage product catalog with categories (cakes, cupcakes, cookies, other), prices and descriptions.
 - **Sales reports**: view revenue, order count, average order value and best sellers for today / this week / this month / a custom range. Export the report to CSV.
-- **Settings**: switch between **English** and **Spanish**, choose the **currency** (PYG by default, plus USD, EUR, ARS), toggle **dark / light** mode, and **export data** to CSV or JSON.
+- **Settings**: set **business name**, switch **English** / **Spanish**, choose **currency** (PYG by default, plus USD, EUR, ARS), toggle **dark / light** mode, and **export data** to CSV or JSON.
 - **Data ownership**: everything is stored in the browser's `localStorage` — no backend, no remote database. Data can be exported as a backup.
 - **Offline-first PWA**: installable and fully functional without an internet connection.
 
@@ -91,12 +95,13 @@ src/app/
 
 ## Scripts
 
-| Command               | Description                            |
-| --------------------- | -------------------------------------- |
-| `npm start`           | Run the dev server                     |
-| `npm run build`       | Production build (with service worker) |
-| `npm test`            | Run unit tests (Vitest)                |
-| `npm run watch`       | Incremental build (development)        |
+| Command               | Description                              |
+| --------------------- | ---------------------------------------- |
+| `npm start`           | Run the dev server                       |
+| `npm run build`       | Dev build                                |
+| `npm run build:prod`  | Production build (with service worker)   |
+| `npm test`            | Run unit tests (Vitest)                  |
+| `npm run watch`       | Incremental build (development)          |
 
 ## Design
 
