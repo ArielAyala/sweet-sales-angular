@@ -18,6 +18,7 @@ function makeOrderInput(): OrderInput {
     deliveryDate: new Date('2026-08-10T15:00:00'),
     deliveryTime: '15:00',
     notes: 'Birthday cake',
+    paymentMethod: 'cash',
   };
 }
 
@@ -95,7 +96,15 @@ describe('OrdersService', () => {
     expect(text).toContain('Customer: Maria Gonzalez');
     expect(text).toContain('Order details:');
     expect(text).toContain('Pickup');
+    expect(text).toContain('Payment method: Cash');
     expect(text).toContain('₲200000');
+  });
+
+  it('saves payment method on create and update', () => {
+    const order = service.createOrder({ ...makeOrderInput(), paymentMethod: 'transfer' });
+    expect(order.paymentMethod).toBe('transfer');
+    service.updateOrder(order.id, { ...makeOrderInput(), paymentMethod: 'cash' });
+    expect(service.getById(order.id)?.paymentMethod).toBe('cash');
   });
 
   it('persists to localStorage', () => {

@@ -8,7 +8,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { OrderItem, orderSubtotal } from '../../../../models/order.model';
-import { DeliveryType, OrderStatus } from '../../../../models/enums';
+import { DeliveryType, PAYMENT_METHODS, PaymentMethod } from '../../../../models/enums';
 import { CurrencyFormatPipe } from '../../../../shared/pipes/currency-format.pipe';
 import { I18nService } from '../../../../core/services/i18n.service';
 
@@ -171,6 +171,29 @@ interface DraftItem extends OrderItem {
         }
       </section>
 
+      <!-- Payment method -->
+      <section
+        class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+      >
+        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
+          {{ 'paymentMethod' | translate }}
+        </h2>
+        <div class="flex gap-3">
+          @for (method of paymentMethods; track method) {
+            <button
+              type="button"
+              (click)="setPaymentMethod(method)"
+              class="flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition-colors"
+              [class]="paymentMethod() === method
+                ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300'
+                : 'border-gray-300 text-gray-600 dark:border-gray-600 dark:text-gray-300'"
+            >
+              {{ method | translate }}
+            </button>
+          }
+        </div>
+      </section>
+
       <!-- Deposit (partial payment) -->
       <section
         class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
@@ -220,7 +243,7 @@ interface DraftItem extends OrderItem {
                   ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300'
                   : 'border-gray-300 text-gray-600 dark:border-gray-600 dark:text-gray-300'"
               >
-                {{ type }}
+                {{ type | translate }}
               </button>
             }
           </div>
@@ -284,8 +307,10 @@ export class OrderFormPage {
   private readonly i18n = inject(I18nService);
 
   readonly deliveryTypes: DeliveryType[] = ['pickup', 'delivery'];
+  readonly paymentMethods = PAYMENT_METHODS;
   readonly draftItems = signal<DraftItem[]>([]);
   readonly deliveryType = signal<DeliveryType>('pickup');
+  readonly paymentMethod = signal<PaymentMethod>('cash');
 
   private readonly depositControl = () => this.form.get('deposit')?.value ?? 0;
   protected readonly deposit = () => Math.max(0, this.depositControl());
@@ -314,6 +339,7 @@ export class OrderFormPage {
           deposit: order.deposit ?? 0,
         });
         this.deliveryType.set(order.deliveryType);
+        this.paymentMethod.set(order.paymentMethod ?? 'cash');
         this.draftItems.set(
           order.items.map((item) => ({ ...item, tempQuantity: item.quantity })),
         );
@@ -379,6 +405,10 @@ export class OrderFormPage {
     this.deliveryType.set(type);
   }
 
+  setPaymentMethod(method: PaymentMethod): void {
+    this.paymentMethod.set(method);
+  }
+
   onSave(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -409,6 +439,7 @@ export class OrderFormPage {
       deliveryTime: value.deliveryTime,
       notes: value.notes.trim() || undefined,
       deposit: Math.max(0, value.deposit) || undefined,
+      paymentMethod: this.paymentMethod(),
     };
     if (this.orderId) {
       this.ordersService.updateOrder(this.orderId, input);

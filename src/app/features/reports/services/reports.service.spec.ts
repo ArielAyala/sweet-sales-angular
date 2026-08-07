@@ -11,6 +11,7 @@ function makeOrder(day: number, price: number, productId = 'p1'): OrderInput {
     deliveryType: 'pickup',
     deliveryDate: new Date(2026, 7, day, 12, 0),
     deliveryTime: '12:00',
+    paymentMethod: 'cash',
   };
 }
 

@@ -184,6 +184,7 @@ export class SettingsPage {
       deliveryType: o.deliveryType,
       deliveryDate: o.deliveryDate,
       deliveryTime: o.deliveryTime,
+      paymentMethod: o.paymentMethod ?? 'cash',
       items: o.items.map((i) => `${i.productName} x${i.quantity}`).join(' | '),
       total: orderTotal(o),
       notes: o.notes ?? '',

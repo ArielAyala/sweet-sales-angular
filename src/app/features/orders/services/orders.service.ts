@@ -14,6 +14,7 @@ export interface OrderInput {
   deliveryTime: string;
   notes?: string;
   deposit?: number;
+  paymentMethod: Order['paymentMethod'];
 }
 
 /**
@@ -74,6 +75,7 @@ export class OrdersService {
       items,
       totalAmount: orderSubtotal(items),
       deposit: input.deposit && input.deposit > 0 ? input.deposit : undefined,
+      paymentMethod: input.paymentMethod,
       status: 'pending',
       deliveryType: input.deliveryType,
       deliveryDate: input.deliveryDate,
@@ -100,6 +102,7 @@ export class OrdersService {
           items,
           totalAmount: orderTotal({ items, priceAdjustment: o.priceAdjustment }),
           deposit: input.deposit && input.deposit > 0 ? input.deposit : undefined,
+          paymentMethod: input.paymentMethod,
           deliveryType: input.deliveryType,
           deliveryDate: input.deliveryDate,
           deliveryTime: input.deliveryTime,
@@ -200,6 +203,7 @@ export class OrdersService {
       lines.push(`${t('deposit')}: ${formatPrice(order.deposit)}`);
       lines.push(`${t('balance')}: ${formatPrice(total - order.deposit)}`);
     }
+    lines.push(`${t('paymentMethod')}: ${t(order.paymentMethod)}`);
     if (this.hasDeliveryInfo(order)) {
       lines.push('');
       const typeLabel = order.deliveryType === 'pickup' ? t('pickup') : t('delivery');
@@ -231,17 +235,21 @@ export class OrdersService {
 
   private migrateOrders(orders: Order[]): Order[] {
     return orders.map((o) => {
+      let migrated = o;
       const legacy = o.customer as unknown as Record<string, string | undefined>;
       if (!o.customer.name && (legacy['firstName'] || legacy['lastName'])) {
-        return {
-          ...o,
+        migrated = {
+          ...migrated,
           customer: {
             name: `${legacy['firstName'] ?? ''} ${legacy['lastName'] ?? ''}`.trim(),
             phone: o.customer.phone,
           },
         };
       }
-      return o;
+      if (!migrated.paymentMethod) {
+        migrated = { ...migrated, paymentMethod: 'cash' };
+      }
+      return migrated;
     });
   }
 

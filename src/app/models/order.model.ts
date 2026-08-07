@@ -1,4 +1,4 @@
-import { DeliveryType, OrderStatus } from './enums';
+import { DeliveryType, OrderStatus, PaymentMethod } from './enums';
 
 export interface Customer {
   name: string;
@@ -27,6 +27,7 @@ export interface Order {
   items: OrderItem[];
   totalAmount: number;
   deposit?: number; // Seña (pago parcial) - opcional
+  paymentMethod: PaymentMethod;
   status: OrderStatus;
   deliveryType: DeliveryType;
   deliveryDate: Date;

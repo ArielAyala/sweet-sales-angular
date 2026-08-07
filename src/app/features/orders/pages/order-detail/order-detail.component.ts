@@ -141,6 +141,17 @@ import { I18nService } from '../../../../core/services/i18n.service';
            </div>
          </section>
 
+         <section
+           class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+         >
+           <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+             {{ 'paymentMethod' | translate }}
+           </h2>
+           <p class="font-medium text-gray-900 dark:text-gray-100">
+             {{ (current.paymentMethod || 'cash') | translate }}
+           </p>
+         </section>
+
          <!-- Deposit (partial payment) -->
          @if (current.deposit && current.deposit > 0) {
            <section
