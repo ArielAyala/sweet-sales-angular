@@ -11,6 +11,7 @@ export interface OrderInput {
   deliveryDate: Date;
   deliveryTime: string;
   notes?: string;
+  deposit?: number;
 }
 
 /**
@@ -66,6 +67,7 @@ export class OrdersService {
       customer: input.customer,
       items,
       totalAmount: orderSubtotal(items),
+      deposit: input.deposit && input.deposit > 0 ? input.deposit : undefined,
       status: 'pending',
       deliveryType: input.deliveryType,
       deliveryDate: input.deliveryDate,
@@ -91,6 +93,7 @@ export class OrdersService {
           customer: input.customer,
           items,
           totalAmount: orderTotal({ items, priceAdjustment: o.priceAdjustment }),
+          deposit: input.deposit && input.deposit > 0 ? input.deposit : undefined,
           deliveryType: input.deliveryType,
           deliveryDate: input.deliveryDate,
           deliveryTime: input.deliveryTime,
@@ -182,7 +185,12 @@ export class OrdersService {
       }
     }
     lines.push('');
-    lines.push(`Total: ${formatPrice(orderTotal(order))}`);
+    const total = orderTotal(order);
+    lines.push(`Total: ${formatPrice(total)}`);
+    if (order.deposit && order.deposit > 0) {
+      lines.push(`Deposit (Seña): ${formatPrice(order.deposit)}`);
+      lines.push(`Balance Due: ${formatPrice(total - order.deposit)}`);
+    }
     lines.push('');
     lines.push(
       `Delivery: ${order.deliveryType === 'pickup' ? 'Pickup' : 'Delivery'} on ${new Date(

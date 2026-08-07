@@ -171,6 +171,37 @@ interface DraftItem extends OrderItem {
         }
       </section>
 
+      <!-- Deposit (partial payment) -->
+      <section
+        class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+      >
+        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
+          {{ 'deposit' | translate }}
+        </h2>
+        <div class="space-y-2">
+          <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            {{ 'depositAmount' | translate }} <span class="text-xs">({{ 'optional' | translate }})</span>
+          </label>
+          <input
+            type="number"
+            formControlName="deposit"
+            inputmode="decimal"
+            min="0"
+            step="0.01"
+            [placeholder]="'depositPlaceholder' | translate"
+            class="min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+          />
+          @if (deposit() > 0) {
+            <div class="mt-3 flex items-center justify-between rounded-lg bg-blue-50 p-3 dark:bg-blue-500/10">
+              <span class="text-sm text-gray-700 dark:text-gray-300">{{ 'balance' | translate }}</span>
+              <span class="font-semibold text-blue-600 dark:text-blue-300">
+                {{ (subtotal() - deposit()) | currencyFormat }}
+              </span>
+            </div>
+          }
+        </div>
+      </section>
+
       <!-- Delivery info -->
       <section
         class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
@@ -256,6 +287,9 @@ export class OrderFormPage {
   readonly draftItems = signal<DraftItem[]>([]);
   readonly deliveryType = signal<DeliveryType>('pickup');
 
+  private readonly depositControl = () => this.form.get('deposit')?.value ?? 0;
+  protected readonly deposit = () => Math.max(0, this.depositControl());
+
   private readonly orderId: string | null = this.route.snapshot.paramMap.get('id');
 
   readonly form = this.fb.nonNullable.group({
@@ -264,6 +298,7 @@ export class OrderFormPage {
     deliveryDate: ['', [Validators.required]],
     deliveryTime: ['', [Validators.required]],
     notes: [''],
+    deposit: [0],
   });
 
   constructor() {
@@ -276,6 +311,7 @@ export class OrderFormPage {
           deliveryDate: order.deliveryDate.toString().slice(0, 10),
           deliveryTime: order.deliveryTime,
           notes: order.notes ?? '',
+          deposit: order.deposit ?? 0,
         });
         this.deliveryType.set(order.deliveryType);
         this.draftItems.set(
@@ -372,6 +408,7 @@ export class OrderFormPage {
       deliveryDate: new Date(value.deliveryDate + 'T' + (value.deliveryTime || '12:00')),
       deliveryTime: value.deliveryTime,
       notes: value.notes.trim() || undefined,
+      deposit: Math.max(0, value.deposit) || undefined,
     };
     if (this.orderId) {
       this.ordersService.updateOrder(this.orderId, input);

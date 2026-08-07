@@ -9,7 +9,7 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
 import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
-import { Order, orderSubtotal, orderTotal } from '../../../../models/order.model';
+import { Order, orderSubtotal, orderTotal, orderBalance } from '../../../../models/order.model';
 import { OrderStatus } from '../../../../models/enums';
 import { CurrencyFormatPipe } from '../../../../shared/pipes/currency-format.pipe';
 import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
@@ -138,14 +138,43 @@ import { I18nService } from '../../../../core/services/i18n.service';
               <span>{{ 'total' | translate }}</span>
               <span class="text-primary-600 dark:text-primary-300">{{ total(current) | currencyFormat }}</span>
             </div>
-          </div>
-        </section>
+           </div>
+         </section>
 
-        <section
-          class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-        >
-          <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-            {{ 'delivery' | translate }}
+         <!-- Deposit (partial payment) -->
+         @if (current.deposit && current.deposit > 0) {
+           <section
+             class="rounded-xl border border-blue-200 bg-blue-50 p-5 shadow-sm dark:border-blue-500/30 dark:bg-blue-500/10"
+           >
+             <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-300">
+               {{ 'deposit' | translate }}
+             </h2>
+             <div class="space-y-2 text-sm">
+               <div class="flex justify-between">
+                 <span class="text-gray-700 dark:text-gray-300">{{ 'total' | translate }}</span>
+                 <span class="font-semibold text-gray-900 dark:text-gray-100">{{ total(current) | currencyFormat }}</span>
+               </div>
+               <div class="flex justify-between">
+                 <span class="text-gray-700 dark:text-gray-300">{{ 'depositAmount' | translate }}</span>
+                 <span class="font-semibold text-blue-600 dark:text-blue-300">{{ current.deposit | currencyFormat }}</span>
+               </div>
+                <div class="border-t border-blue-200 pt-2 dark:border-blue-500/30">
+                  <div class="flex justify-between">
+                    <span class="font-medium text-gray-900 dark:text-gray-100">{{ 'balance' | translate }}</span>
+                    <span class="text-lg font-bold text-blue-600 dark:text-blue-300">
+                      {{ balance(current) | currencyFormat }}
+                    </span>
+                  </div>
+                </div>
+             </div>
+           </section>
+         }
+
+         <section
+           class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+         >
+           <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+             {{ 'delivery' | translate }}
           </h2>
           <div class="grid grid-cols-2 gap-3 text-sm">
             <div>
@@ -191,33 +220,56 @@ import { I18nService } from '../../../../core/services/i18n.service';
         </div>
       }
 
-      <!-- Price adjustment modal -->
-      @if (adjustPriceOpen()) {
-        <app-modal [title]="'markCompletedTitle' | translate" (closeEvent)="adjustPriceOpen.set(false)">
-          <div class="space-y-4">
-            <p class="text-sm text-gray-600 dark:text-gray-300">{{ 'adjustPriceHint' | translate }}</p>
-            <div>
-              <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {{ 'adjustPrice' | translate }}
-              </label>
-              <input
-                type="number"
-                inputmode="decimal"
-                [value]="adjustedAmount()"
-                (input)="onAmountInput($any($event.target).value)"
-                class="min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {{ 'adjustmentReason' | translate }} <span class="text-xs">({{ 'optional' | translate }})</span>
-              </label>
-              <input
-                type="text"
-                [value]="adjustmentReason()"
-                (input)="adjustmentReason.set($any($event.target).value)"
-                class="min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
-              />
+       <!-- Price adjustment modal -->
+       @if (adjustPriceOpen()) {
+         <app-modal [title]="'markCompletedTitle' | translate" (closeEvent)="adjustPriceOpen.set(false)">
+           <div class="space-y-4">
+             <p class="text-sm text-gray-600 dark:text-gray-300">{{ 'adjustPriceHint' | translate }}</p>
+             
+             <!-- Current order summary -->
+             @let current = order()!;
+             <div class="rounded-lg bg-gray-50 p-3 dark:bg-gray-700/50">
+               <div class="space-y-1 text-sm">
+                 <div class="flex justify-between text-gray-600 dark:text-gray-400">
+                   <span>{{ 'subtotal' | translate }}</span>
+                   <span>{{ subtotal(current) | currencyFormat }}</span>
+                 </div>
+                 @if (current.deposit && current.deposit > 0) {
+                   <div class="flex justify-between text-blue-600 dark:text-blue-300">
+                     <span>{{ 'depositAmount' | translate }}</span>
+                     <span>{{ current.deposit | currencyFormat }}</span>
+                   </div>
+                 }
+               </div>
+             </div>
+
+             <div>
+               <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                 {{ 'adjustPrice' | translate }}
+               </label>
+               <input
+                 type="number"
+                 inputmode="decimal"
+                 [value]="adjustedAmount()"
+                 (input)="onAmountInput($any($event.target).value)"
+                 class="min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+               />
+               @if (current.deposit && current.deposit > 0) {
+                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                   {{ 'balance' | translate }}: {{ (adjustedAmount() - current.deposit) | currencyFormat }}
+                 </p>
+               }
+             </div>
+             <div>
+               <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                 {{ 'adjustmentReason' | translate }} <span class="text-xs">({{ 'optional' | translate }})</span>
+               </label>
+               <input
+                 type="text"
+                 [value]="adjustmentReason()"
+                 (input)="adjustmentReason.set($any($event.target).value)"
+                 class="min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+               />
             </div>
             <div class="flex justify-end gap-3">
               <app-button variant="ghost" (clickEvent)="adjustPriceOpen.set(false)">
@@ -273,6 +325,10 @@ export class OrderDetailPage {
 
   total(order: Order): number {
     return orderTotal(order);
+  }
+
+  balance(order: Order): number {
+    return orderBalance(order);
   }
 
   statusBadgeClass(status: OrderStatus): string {

@@ -26,6 +26,7 @@ export interface Order {
   customer: Customer;
   items: OrderItem[];
   totalAmount: number;
+  deposit?: number; // Seña (pago parcial) - opcional
   status: OrderStatus;
   deliveryType: DeliveryType;
   deliveryDate: Date;
@@ -57,4 +58,13 @@ export function orderSubtotal(items: OrderItem[]): number {
 export function orderTotal(order: Pick<Order, 'items' | 'priceAdjustment'>): number {
   const subtotal = orderSubtotal(order.items);
   return order.priceAdjustment ? order.priceAdjustment.adjustedAmount : subtotal;
+}
+
+/**
+ * Computes the remaining balance after deposit.
+ */
+export function orderBalance(order: Pick<Order, 'items' | 'priceAdjustment' | 'deposit'>): number {
+  const total = orderTotal(order);
+  const deposit = order.deposit || 0;
+  return total - deposit;
 }
