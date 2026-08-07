@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { SettingsService } from '../../../../core/services/settings.service';
 import { CurrencyService } from '../../../../core/services/currency.service';
@@ -15,12 +16,36 @@ import { orderTotal } from '../../../../models/order.model';
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [TranslatePipe, ButtonComponent, IconComponent],
+  imports: [FormsModule, TranslatePipe, ButtonComponent, IconComponent],
   template: `
     <div class="mx-auto max-w-lg space-y-6">
       <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
         {{ 'settingsTitle' | translate }}
       </h1>
+
+      <!-- Business name -->
+      <section class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <h2 class="mb-1 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          {{ 'businessNameSection' | translate }}
+        </h2>
+        <p class="mb-3 text-sm text-gray-600 dark:text-gray-300">{{ 'businessNameHint' | translate }}</p>
+        <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300" for="business-name">
+          {{ 'businessNameLabel' | translate }}
+        </label>
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <input
+            id="business-name"
+            type="text"
+            [(ngModel)]="businessNameDraft"
+            [placeholder]="'businessNamePlaceholder' | translate"
+            maxlength="60"
+            class="min-h-11 w-full flex-1 rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+          />
+          <app-button variant="secondary" (clickEvent)="saveBusinessName()">
+            {{ 'save' | translate }}
+          </app-button>
+        </div>
+      </section>
 
       <!-- Language -->
       <section class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
@@ -104,7 +129,7 @@ import { orderTotal } from '../../../../models/order.model';
           {{ 'aboutSection' | translate }}
         </h2>
         <div class="flex items-center justify-between">
-          <span class="text-sm text-gray-700 dark:text-gray-300">{{ 'appName' | translate }}</span>
+          <span class="text-sm text-gray-700 dark:text-gray-300">{{ settings.businessName() }}</span>
           <span class="text-sm text-gray-500 dark:text-gray-400">{{ 'version' | translate }} 0.1.0</span>
         </div>
       </section>
@@ -114,6 +139,7 @@ import { orderTotal } from '../../../../models/order.model';
 export class SettingsPage {
   readonly languages: Language[] = ['en', 'es'];
   readonly themes: ThemeMode[] = ['light', 'dark'];
+  businessNameDraft = '';
 
   constructor(
     readonly settings: SettingsService,
@@ -122,7 +148,15 @@ export class SettingsPage {
     private readonly toastService: ToastService,
     private readonly ordersService: OrdersService,
     private readonly productsService: ProductsService,
-  ) {}
+  ) {
+    this.businessNameDraft = this.settings.businessName();
+  }
+
+  saveBusinessName(): void {
+    this.settings.setBusinessName(this.businessNameDraft);
+    this.businessNameDraft = this.settings.businessName();
+    this.toastService.success(this.i18n.translate('changesSaved'));
+  }
 
   setLanguage(lang: Language): void {
     this.settings.setLanguage(lang);

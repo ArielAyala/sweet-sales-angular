@@ -6,14 +6,17 @@ import { STORAGE_KEYS } from '../constants/storage-keys.const';
 import { StorageService } from './storage.service';
 import { I18nService } from './i18n.service';
 
+export const DEFAULT_BUSINESS_NAME = 'Sweet Sales';
+
 const DEFAULT_SETTINGS: AppSettings = {
+  businessName: DEFAULT_BUSINESS_NAME,
   language: 'en',
   currencyCode: DEFAULT_CURRENCY_CODE,
   theme: 'light',
 };
 
 /**
- * Single source of truth for application settings (language, currency, theme).
+ * Single source of truth for application settings (business name, language, currency, theme).
  * Persists the whole settings object under one storage key.
  */
 @Injectable({ providedIn: 'root' })
@@ -34,9 +37,15 @@ export class SettingsService {
     });
   }
 
+  readonly businessName = computed(() => this.settings().businessName || DEFAULT_BUSINESS_NAME);
   readonly language = computed(() => this.settings().language);
   readonly currencyCode = computed(() => this.settings().currencyCode);
   readonly theme = computed(() => this.settings().theme);
+
+  setBusinessName(businessName: string): void {
+    const name = businessName.trim() || DEFAULT_BUSINESS_NAME;
+    this.updateSettings({ businessName: name });
+  }
 
   setLanguage(language: Language): void {
     this.updateSettings({ language });
@@ -66,7 +75,11 @@ export class SettingsService {
       STORAGE_KEYS.settings,
       null,
     );
-    return { ...DEFAULT_SETTINGS, ...stored };
+    const merged = { ...DEFAULT_SETTINGS, ...stored };
+    if (!merged.businessName?.trim()) {
+      merged.businessName = DEFAULT_BUSINESS_NAME;
+    }
+    return merged;
   }
 
   private applyTheme(theme: ThemeMode): void {

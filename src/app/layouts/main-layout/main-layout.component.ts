@@ -33,7 +33,7 @@ const NAV_ITEMS: NavItem[] = [
         <div class="flex h-16 items-center gap-2 border-b border-gray-200 px-6 dark:border-gray-700">
           <span class="flex size-9 items-center justify-center rounded-xl bg-primary-500 text-lg">🧁</span>
           <span class="text-lg font-bold text-gray-900 dark:text-gray-100">
-            {{ 'appName' | translate }}
+            {{ settings.businessName() }}
           </span>
         </div>
         <nav class="flex-1 space-y-1 p-3">
@@ -59,11 +59,11 @@ const NAV_ITEMS: NavItem[] = [
           <div class="flex items-center gap-2 lg:hidden">
             <span class="flex size-9 items-center justify-center rounded-xl bg-primary-500 text-lg">🧁</span>
             <span class="text-lg font-bold text-gray-900 dark:text-gray-100">
-              {{ 'appName' | translate }}
+              {{ settings.businessName() }}
             </span>
           </div>
           <div class="hidden lg:block text-sm font-medium text-gray-500 dark:text-gray-400">
-            {{ 'appName' | translate }}
+            {{ settings.businessName() }}
           </div>
           <div class="flex items-center gap-2">
             <span class="text-sm font-semibold text-primary-600 dark:text-primary-300">

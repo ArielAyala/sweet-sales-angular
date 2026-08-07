@@ -46,7 +46,9 @@ export const es = {
   customer: 'Cliente',
   customerName: 'Nombre del cliente',
   phone: 'Número de celular',
+  phoneShort: 'Teléfono',
   items: 'Productos',
+  orderItemsDetail: 'Detalle del pedido',
   quantity: 'Cantidad',
   unitPrice: 'Precio unitario',
   price: 'Precio',
@@ -146,6 +148,10 @@ export const es = {
 
   // Settings
   settingsTitle: 'Configuración',
+  businessNameSection: 'Nombre comercial',
+  businessNameLabel: 'Nombre comercial',
+  businessNamePlaceholder: 'Ej: Sweet Sales',
+  businessNameHint: 'Se muestra en el encabezado y al compartir pedidos',
   language: 'Idioma',
   languageSection: 'Idioma',
   currency: 'Moneda',
@@ -161,6 +167,7 @@ export const es = {
   exportHint: 'Descarga tus datos como respaldo o para compartir',
   aboutSection: 'Acerca de',
   version: 'Versión',
+  shareDeliveryLine: '{{type}} el {{date}} a las {{time}}',
 
   // Toasts
   success: 'Éxito',

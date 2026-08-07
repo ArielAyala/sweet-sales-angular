@@ -46,7 +46,9 @@ export const en = {
   customer: 'Customer',
   customerName: 'Customer name',
   phone: 'Phone number',
+  phoneShort: 'Phone',
   items: 'Items',
+  orderItemsDetail: 'Order details',
   quantity: 'Quantity',
   unitPrice: 'Unit price',
   price: 'Price',
@@ -146,6 +148,10 @@ export const en = {
 
   // Settings
   settingsTitle: 'Settings',
+  businessNameSection: 'Business name',
+  businessNameLabel: 'Commercial name',
+  businessNamePlaceholder: 'e.g. Sweet Sales',
+  businessNameHint: 'Shown in the app header and when sharing orders',
   language: 'Language',
   languageSection: 'Language',
   currency: 'Currency',
@@ -161,6 +167,7 @@ export const en = {
   exportHint: 'Download your data as backup or to share',
   aboutSection: 'About',
   version: 'Version',
+  shareDeliveryLine: '{{type}} on {{date}} at {{time}}',
 
   // Toasts
   success: 'Success',

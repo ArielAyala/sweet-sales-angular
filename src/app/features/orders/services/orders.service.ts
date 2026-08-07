@@ -2,6 +2,8 @@ import { Injectable, signal } from '@angular/core';
 import { Order, OrderItem, orderSubtotal, orderTotal } from '../../../models/order.model';
 import { OrderStatus } from '../../../models/enums';
 import { StorageService } from '../../../core/services/storage.service';
+import { SettingsService } from '../../../core/services/settings.service';
+import { I18nService } from '../../../core/services/i18n.service';
 import { STORAGE_KEYS } from '../../../core/constants/storage-keys.const';
 
 export interface OrderInput {
@@ -24,7 +26,11 @@ export class OrdersService {
 
   private lastOrderNumber = 0;
 
-  constructor(private readonly storage: StorageService) {
+  constructor(
+    private readonly storage: StorageService,
+    private readonly settings: SettingsService,
+    private readonly i18n: I18nService,
+  ) {
     this.orders.set(this.migrateOrders(this.storage.get<Order[]>(STORAGE_KEYS.orders, [])));
     this.lastOrderNumber = this.storage.get<number>(STORAGE_KEYS.lastOrderNumber, 0);
   }
@@ -167,40 +173,60 @@ export class OrdersService {
 
   /**
    * Builds a shareable plain-text summary of an order.
+   * Labels follow the current language; header uses the configured business name.
    */
   shareSummary(order: Order, formatPrice: (value: number) => string): string {
+    const t = (key: string, params?: Record<string, string | number>) =>
+      this.i18n.translate(key, params);
     const lines: string[] = [];
-    lines.push(`🧁 Sweet Sales - Order #${order.orderNumber}`);
+    lines.push(`🧁 ${this.settings.businessName()} - ${t('orderNumber')}${order.orderNumber}`);
     lines.push('');
-    lines.push(`Customer: ${order.customer.name}`);
+    lines.push(`${t('customer')}: ${order.customer.name}`);
     if (order.customer.phone) {
-      lines.push(`Phone: ${order.customer.phone}`);
+      lines.push(`${t('phoneShort')}: ${order.customer.phone}`);
     }
     lines.push('');
-    lines.push('Items:');
+    lines.push(`${t('orderItemsDetail')}:`);
     for (const item of order.items) {
       lines.push(`- ${item.productName} x${item.quantity} - ${formatPrice(item.unitPrice)}`);
       if (item.customizations) {
-        lines.push(`  Note: ${item.customizations}`);
+        lines.push(`  ${t('notes')}: ${item.customizations}`);
       }
     }
     lines.push('');
     const total = orderTotal(order);
-    lines.push(`Total: ${formatPrice(total)}`);
+    lines.push(`${t('total')}: ${formatPrice(total)}`);
     if (order.deposit && order.deposit > 0) {
-      lines.push(`Deposit (Seña): ${formatPrice(order.deposit)}`);
-      lines.push(`Balance Due: ${formatPrice(total - order.deposit)}`);
+      lines.push(`${t('deposit')}: ${formatPrice(order.deposit)}`);
+      lines.push(`${t('balance')}: ${formatPrice(total - order.deposit)}`);
     }
-    lines.push('');
-    lines.push(
-      `Delivery: ${order.deliveryType === 'pickup' ? 'Pickup' : 'Delivery'} on ${new Date(
-        order.deliveryDate,
-      ).toLocaleDateString()} at ${order.deliveryTime}`,
-    );
+    if (this.hasDeliveryInfo(order)) {
+      lines.push('');
+      const typeLabel = order.deliveryType === 'pickup' ? t('pickup') : t('delivery');
+      lines.push(
+        t('shareDeliveryLine', {
+          type: typeLabel,
+          date: new Date(order.deliveryDate).toLocaleDateString(),
+          time: order.deliveryTime,
+        }),
+      );
+    }
     if (order.notes) {
-      lines.push(`Notes: ${order.notes}`);
+      lines.push('');
+      lines.push(`${t('notes')}: ${order.notes}`);
     }
     return lines.join('\n');
+  }
+
+  private hasDeliveryInfo(order: Order): boolean {
+    if (!order.deliveryType || !order.deliveryTime) {
+      return false;
+    }
+    if (!order.deliveryDate) {
+      return false;
+    }
+    const date = new Date(order.deliveryDate);
+    return !Number.isNaN(date.getTime());
   }
 
   private migrateOrders(orders: Order[]): Order[] {

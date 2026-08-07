@@ -91,7 +91,10 @@ describe('OrdersService', () => {
     const order = service.createOrder(makeOrderInput());
     const text = service.shareSummary(order, (v) => `₲${v}`);
     expect(text).toContain('Order #0001');
-    expect(text).toContain('Maria Gonzalez');
+    expect(text).toContain('Sweet Sales');
+    expect(text).toContain('Customer: Maria Gonzalez');
+    expect(text).toContain('Order details:');
+    expect(text).toContain('Pickup');
     expect(text).toContain('₲200000');
   });
 

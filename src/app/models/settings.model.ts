@@ -8,6 +8,7 @@ export interface Currency {
 }
 
 export interface AppSettings {
+  businessName: string;
   language: Language;
   currencyCode: string;
   theme: ThemeMode;
