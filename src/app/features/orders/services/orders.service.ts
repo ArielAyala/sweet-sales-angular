@@ -10,8 +10,8 @@ export interface OrderInput {
   customer: Order['customer'];
   items: OrderItem[];
   deliveryType: Order['deliveryType'];
-  deliveryDate: Date;
-  deliveryTime: string;
+  deliveryDate?: Date;
+  deliveryTime?: string;
   notes?: string;
   deposit?: number;
   paymentMethod: Order['paymentMethod'];
@@ -204,33 +204,30 @@ export class OrdersService {
       lines.push(`${t('balance')}: ${formatPrice(total - order.deposit)}`);
     }
     lines.push(`${t('paymentMethod')}: ${t(order.paymentMethod)}`);
-    if (this.hasDeliveryInfo(order)) {
+    if (order.deliveryType) {
       lines.push('');
       const typeLabel = order.deliveryType === 'pickup' ? t('pickup') : t('delivery');
-      lines.push(
-        t('shareDeliveryLine', {
-          type: typeLabel,
-          date: new Date(order.deliveryDate).toLocaleDateString(),
-          time: order.deliveryTime,
-        }),
-      );
+      if (order.deliveryDate && order.deliveryTime) {
+        lines.push(
+          t('shareDeliveryLine', {
+            type: typeLabel,
+            date: new Date(order.deliveryDate).toLocaleDateString(),
+            time: order.deliveryTime,
+          }),
+        );
+      } else if (order.deliveryDate) {
+        lines.push(`${typeLabel}: ${new Date(order.deliveryDate).toLocaleDateString()}`);
+      } else if (order.deliveryTime) {
+        lines.push(`${typeLabel}: ${order.deliveryTime}`);
+      } else {
+        lines.push(typeLabel);
+      }
     }
     if (order.notes) {
       lines.push('');
       lines.push(`${t('notes')}: ${order.notes}`);
     }
     return lines.join('\n');
-  }
-
-  private hasDeliveryInfo(order: Order): boolean {
-    if (!order.deliveryType || !order.deliveryTime) {
-      return false;
-    }
-    if (!order.deliveryDate) {
-      return false;
-    }
-    const date = new Date(order.deliveryDate);
-    return !Number.isNaN(date.getTime());
   }
 
   private migrateOrders(orders: Order[]): Order[] {

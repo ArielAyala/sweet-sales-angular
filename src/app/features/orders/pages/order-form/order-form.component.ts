@@ -251,6 +251,7 @@ interface DraftItem extends OrderItem {
             <div>
               <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {{ 'deliveryDate' | translate }}
+                <span class="text-xs">({{ 'optional' | translate }})</span>
               </label>
               <input
                 type="date"
@@ -261,6 +262,7 @@ interface DraftItem extends OrderItem {
             <div>
               <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {{ 'deliveryTime' | translate }}
+                <span class="text-xs">({{ 'optional' | translate }})</span>
               </label>
               <input
                 type="time"
@@ -320,8 +322,8 @@ export class OrderFormPage {
   readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required]],
     phone: [''],
-    deliveryDate: ['', [Validators.required]],
-    deliveryTime: ['', [Validators.required]],
+    deliveryDate: [''],
+    deliveryTime: [''],
     notes: [''],
     deposit: [0],
   });
@@ -333,8 +335,10 @@ export class OrderFormPage {
         this.form.patchValue({
           name: order.customer.name,
           phone: order.customer.phone ?? '',
-          deliveryDate: order.deliveryDate.toString().slice(0, 10),
-          deliveryTime: order.deliveryTime,
+          deliveryDate: order.deliveryDate
+            ? order.deliveryDate.toString().slice(0, 10)
+            : '',
+          deliveryTime: order.deliveryTime ?? '',
           notes: order.notes ?? '',
           deposit: order.deposit ?? 0,
         });
@@ -428,6 +432,10 @@ export class OrderFormPage {
       this.toastService.error(this.i18n.translate('atLeastOneItem'));
       return;
     }
+    const deliveryDate = value.deliveryDate
+      ? new Date(value.deliveryDate + 'T' + (value.deliveryTime || '12:00'))
+      : undefined;
+    const deliveryTime = value.deliveryTime.trim() || undefined;
     const input = {
       customer: {
         name: value.name.trim(),
@@ -435,8 +443,8 @@ export class OrderFormPage {
       },
       items,
       deliveryType: this.deliveryType(),
-      deliveryDate: new Date(value.deliveryDate + 'T' + (value.deliveryTime || '12:00')),
-      deliveryTime: value.deliveryTime,
+      deliveryDate,
+      deliveryTime,
       notes: value.notes.trim() || undefined,
       deposit: Math.max(0, value.deposit) || undefined,
       paymentMethod: this.paymentMethod(),

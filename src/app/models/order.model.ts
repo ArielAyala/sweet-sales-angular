@@ -30,8 +30,8 @@ export interface Order {
   paymentMethod: PaymentMethod;
   status: OrderStatus;
   deliveryType: DeliveryType;
-  deliveryDate: Date;
-  deliveryTime: string;
+  deliveryDate?: Date;
+  deliveryTime?: string;
   notes?: string;
   priceAdjustment?: PriceAdjustment;
   createdAt: Date;

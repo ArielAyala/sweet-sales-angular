@@ -91,9 +91,11 @@ type StatusFilter = OrderStatus | 'all';
                     {{ statusLabel(order.status) | translate }}
                   </span>
                 </div>
-                <span class="text-sm text-gray-500 dark:text-gray-400">
-                  {{ order.deliveryDate | dateFormat }}
-                </span>
+                @if (order.deliveryDate) {
+                  <span class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ order.deliveryDate | dateFormat }}
+                  </span>
+                }
               </div>
               <div class="mt-2 flex items-center justify-between">
                 <div>

@@ -190,14 +190,24 @@ import { I18nService } from '../../../../core/services/i18n.service';
           <div class="grid grid-cols-2 gap-3 text-sm">
             <div>
               <p class="text-gray-500 dark:text-gray-400">{{ 'deliveryType' | translate }}</p>
-              <p class="font-medium capitalize text-gray-900 dark:text-gray-100">{{ current.deliveryType }}</p>
-            </div>
-            <div>
-              <p class="text-gray-500 dark:text-gray-400">{{ 'deliveryDate' | translate }}</p>
               <p class="font-medium text-gray-900 dark:text-gray-100">
-                {{ current.deliveryDate | dateFormat }} · {{ current.deliveryTime }}
+                {{ current.deliveryType | translate }}
               </p>
             </div>
+            @if (current.deliveryDate || current.deliveryTime) {
+              <div>
+                <p class="text-gray-500 dark:text-gray-400">{{ 'deliveryDate' | translate }}</p>
+                <p class="font-medium text-gray-900 dark:text-gray-100">
+                  @if (current.deliveryDate && current.deliveryTime) {
+                    {{ current.deliveryDate | dateFormat }} · {{ current.deliveryTime }}
+                  } @else if (current.deliveryDate) {
+                    {{ current.deliveryDate | dateFormat }}
+                  } @else {
+                    {{ current.deliveryTime }}
+                  }
+                </p>
+              </div>
+            }
             @if (current.notes) {
               <div class="col-span-2">
                 <p class="text-gray-500 dark:text-gray-400">{{ 'notes' | translate }}</p>
