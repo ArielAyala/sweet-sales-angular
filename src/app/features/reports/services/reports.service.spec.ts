@@ -6,7 +6,7 @@ import { OrderInput } from '../../orders/services/orders.service';
 
 function makeOrder(day: number, price: number, productId = 'p1'): OrderInput {
   return {
-    customer: { firstName: 'A', lastName: 'B' },
+    customer: { name: 'A B' },
     items: [{ productId, productName: 'Cake', quantity: 1, unitPrice: price }],
     deliveryType: 'pickup',
     deliveryDate: new Date(2026, 7, day, 12, 0),

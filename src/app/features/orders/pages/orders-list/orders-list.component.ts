@@ -98,7 +98,7 @@ type StatusFilter = OrderStatus | 'all';
               <div class="mt-2 flex items-center justify-between">
                 <div>
                   <p class="text-sm text-gray-700 dark:text-gray-300">
-                    {{ order.customer.firstName }} {{ order.customer.lastName }}
+                    {{ order.customer.name }}
                   </p>
                   <p class="text-xs text-gray-500 dark:text-gray-400">
                     {{ order.items.length }} {{ 'items' | translate }} · {{ order.deliveryType }}
@@ -131,7 +131,7 @@ export class OrdersListPage {
         const matchesQuery =
           query === '' ||
           o.orderNumber.toLowerCase().includes(query) ||
-          `${o.customer.firstName} ${o.customer.lastName}`.toLowerCase().includes(query);
+          o.customer.name.toLowerCase().includes(query);
         return matchesStatus && matchesQuery;
       }),
     );

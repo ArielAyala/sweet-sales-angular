@@ -89,7 +89,7 @@ import { I18nService } from '../../../../core/services/i18n.service';
             </span>
             <div>
               <p class="font-semibold text-gray-900 dark:text-gray-100">
-                {{ current.customer.firstName }} {{ current.customer.lastName }}
+                {{ current.customer.name }}
               </p>
               @if (current.customer.phone) {
                 <p class="text-sm text-gray-500 dark:text-gray-400">

@@ -24,7 +24,7 @@ export class OrdersService {
   private lastOrderNumber = 0;
 
   constructor(private readonly storage: StorageService) {
-    this.orders.set(this.storage.get<Order[]>(STORAGE_KEYS.orders, []));
+    this.orders.set(this.migrateOrders(this.storage.get<Order[]>(STORAGE_KEYS.orders, [])));
     this.lastOrderNumber = this.storage.get<number>(STORAGE_KEYS.lastOrderNumber, 0);
   }
 
@@ -42,7 +42,7 @@ export class OrdersService {
       return this.orders();
     }
     return this.orders().filter((o) => {
-      const customer = `${o.customer.firstName} ${o.customer.lastName}`.toLowerCase();
+      const customer = o.customer.name.toLowerCase();
       const number = o.orderNumber.toLowerCase();
       return customer.includes(q) || number.includes(q);
     });
@@ -169,7 +169,7 @@ export class OrdersService {
     const lines: string[] = [];
     lines.push(`🧁 Sweet Sales - Order #${order.orderNumber}`);
     lines.push('');
-    lines.push(`Customer: ${order.customer.firstName} ${order.customer.lastName}`);
+    lines.push(`Customer: ${order.customer.name}`);
     if (order.customer.phone) {
       lines.push(`Phone: ${order.customer.phone}`);
     }
@@ -193,6 +193,22 @@ export class OrdersService {
       lines.push(`Notes: ${order.notes}`);
     }
     return lines.join('\n');
+  }
+
+  private migrateOrders(orders: Order[]): Order[] {
+    return orders.map((o) => {
+      const legacy = o.customer as unknown as Record<string, string | undefined>;
+      if (!o.customer.name && (legacy['firstName'] || legacy['lastName'])) {
+        return {
+          ...o,
+          customer: {
+            name: `${legacy['firstName'] ?? ''} ${legacy['lastName'] ?? ''}`.trim(),
+            phone: o.customer.phone,
+          },
+        };
+      }
+      return o;
+    });
   }
 
   private normalizeItems(items: OrderItem[]): OrderItem[] {

@@ -50,27 +50,15 @@ interface DraftItem extends OrderItem {
           {{ 'customer' | translate }}
         </h2>
         <div class="space-y-4">
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {{ 'firstName' | translate }}
-              </label>
-              <input
-                type="text"
-                formControlName="firstName"
-                class="min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {{ 'lastName' | translate }}
-              </label>
-              <input
-                type="text"
-                formControlName="lastName"
-                class="min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
-              />
-            </div>
+          <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              {{ 'customerName' | translate }}
+            </label>
+            <input
+              type="text"
+              formControlName="name"
+              class="min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+            />
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -271,8 +259,7 @@ export class OrderFormPage {
   private readonly orderId: string | null = this.route.snapshot.paramMap.get('id');
 
   readonly form = this.fb.nonNullable.group({
-    firstName: ['', [Validators.required]],
-    lastName: ['', [Validators.required]],
+    name: ['', [Validators.required]],
     phone: [''],
     deliveryDate: ['', [Validators.required]],
     deliveryTime: ['', [Validators.required]],
@@ -284,8 +271,7 @@ export class OrderFormPage {
       const order = this.ordersService.getById(this.orderId);
       if (order) {
         this.form.patchValue({
-          firstName: order.customer.firstName,
-          lastName: order.customer.lastName,
+          name: order.customer.name,
           phone: order.customer.phone ?? '',
           deliveryDate: order.deliveryDate.toString().slice(0, 10),
           deliveryTime: order.deliveryTime,
@@ -378,8 +364,7 @@ export class OrderFormPage {
     }
     const input = {
       customer: {
-        firstName: value.firstName.trim(),
-        lastName: value.lastName.trim(),
+        name: value.name.trim(),
         phone: value.phone.trim() || undefined,
       },
       items,

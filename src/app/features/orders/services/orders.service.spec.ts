@@ -5,7 +5,7 @@ import { Order } from '../../../models/order.model';
 
 function makeOrderInput(): OrderInput {
   return {
-    customer: { firstName: 'Maria', lastName: 'Gonzalez', phone: '0981' },
+    customer: { name: 'Maria Gonzalez', phone: '0981' },
     items: [
       {
         productId: 'p1',

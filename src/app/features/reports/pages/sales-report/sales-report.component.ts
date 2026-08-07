@@ -182,7 +182,7 @@ export class SalesReportPage {
     const orders = this.reportsService.getCompletedInRange(start, end);
     const rows = orders.map((o) => ({
       orderNumber: o.orderNumber,
-      customer: `${o.customer.firstName} ${o.customer.lastName}`,
+      customer: o.customer.name,
       deliveryDate: o.deliveryDate,
       deliveryTime: o.deliveryTime,
       items: o.items.map((i) => `${i.productName} x${i.quantity}`).join(' | '),

@@ -1,8 +1,7 @@
 import { DeliveryType, OrderStatus } from './enums';
 
 export interface Customer {
-  firstName: string;
-  lastName: string;
+  name: string;
   phone?: string;
 }
 
